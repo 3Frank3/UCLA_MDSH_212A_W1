@@ -1,0 +1,18 @@
+---
+title: "212A_W1-1"
+output: html_document
+date: "2026-01-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+
+# Import Income2 data
+income <- read_csv("../data/Income2.csv", col_select = Education:Income) %>% 
+  print(width = Inf)
+```
+
