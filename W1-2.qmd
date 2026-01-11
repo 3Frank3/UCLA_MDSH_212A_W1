@@ -5,23 +5,82 @@ format: html
 editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
-1 + 1
+library(GGally) # ggpairs function
+library(tidyverse)
+library(readr)
+Advertising <- read_csv("advertising.csv",  col_select = TV:Sales) %>% 
+  print(width = Inf)
+summary(Advertising)
 ```
 
-You can add options to executable code like this
-
 ```{r}
-#| echo: false
-2 * 2
+# Visualization by pair plot
+ggpairs(
+  data = Advertising, 
+  mapping = aes(alpha = 0.25), 
+  lower = list(continuous = "smooth")
+  ) + 
+  labs(title = "Advertising Data")
+```
+```{r}
+fit <- lm(Sales ~ TV, data = Advertising)
+(d <- Advertising %>%
+  select(Sales, TV) %>%
+  mutate(predicted = predict(fit), # Save the predicted values
+         residuals = residuals(fit))) # Save the residual values
+```
+```{r}
+coefficients(fit)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+```{r}
+library(ggplot2)
+ggplot(d, aes(x = TV, y = Sales)) +  # Set up canvas with outcome variable on y-axis
+  geom_point( color = "red") +
+  geom_abline(intercept = coefficients(fit)[1], slope = coefficients(fit)[2], color = "blue") + 
+  geom_segment(aes(xend = TV, yend = predicted), color = "gray") +  # Add prediction lines
+  scale_x_continuous(breaks = seq(0, 300, by = 50), limits = c(0, 300)) + # Set x-axis limits
+  scale_y_continuous(breaks = seq(0, 30, by = 5), limits = c(0, 28)) +
+  xlab("TV") +
+  ylab("Sales") +
+  theme_bw() + 
+  theme(panel.background = element_rect(colour = "black", linewidth = 1),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black"))
+```
+
+```{r}
+beta1 <- with(d, sum((TV - mean(TV)) * (Sales - mean(Sales))) / sum((TV - mean(TV))^2))
+beta0 <- with(d, mean(Sales) - beta1 * mean(TV))
+beta1
+beta0
+```
+```{r}
+library(gtsummary)
+
+fit <- lm(Sales ~ TV, data = Advertising)
+fit %>%
+  tbl_regression(estimate_fun = function(x) style_number(x, digits = 3),
+                 intercept = T) %>%
+  bold_labels() %>%
+  bold_p(t = 0.05) %>%
+  modify_column_unhide(columns = c(statistic, std.error))
+```
+```{r}
+library(gtsummary)
+
+fit <- lm(Sales ~ TV, data = Advertising)
+fit %>%
+  tbl_regression(estimate_fun = function(x) style_number(x, digits = 3),
+                 intercept = T) %>%
+  bold_labels() %>%
+  bold_p(t = 0.05) %>%
+  modify_column_unhide(columns = c(statistic, std.error)) %>%
+  add_glance_source_note(
+    label = list(sigma ~ "\U03C3"),
+    include = c(r.squared, sigma)
+  )
+```
+
