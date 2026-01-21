@@ -23,6 +23,7 @@ ggpairs(
   ) + 
   labs(title = "Advertising Data")
 ```
+
 ```{r}
 fit <- lm(Sales ~ TV, data = Advertising)
 (d <- Advertising %>%
@@ -30,6 +31,7 @@ fit <- lm(Sales ~ TV, data = Advertising)
   mutate(predicted = predict(fit), # Save the predicted values
          residuals = residuals(fit))) # Save the residual values
 ```
+
 ```{r}
 coefficients(fit)
 ```
@@ -57,6 +59,7 @@ beta0 <- with(d, mean(Sales) - beta1 * mean(TV))
 beta1
 beta0
 ```
+
 ```{r}
 library(gtsummary)
 
@@ -68,6 +71,7 @@ fit %>%
   bold_p(t = 0.05) %>%
   modify_column_unhide(columns = c(statistic, std.error))
 ```
+
 ```{r}
 library(gtsummary)
 
@@ -83,4 +87,3 @@ fit %>%
     include = c(r.squared, sigma)
   )
 ```
-
