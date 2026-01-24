@@ -51,7 +51,6 @@ $\hat f$.
 ## ISL Exercise 2.4.3 (10% pts)
 
 
-
 ```{r, eval = F}
 library(tidyverse)
 fit <- lm(sales ~ TV, data = )
