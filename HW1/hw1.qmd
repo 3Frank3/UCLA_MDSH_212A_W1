@@ -50,6 +50,67 @@ $\hat f$.
 
 ## ISL Exercise 2.4.3 (10% pts)
 
+*2.4.3. We now revisit the bias-variance decomposition.*
+(a) Provide a sketch of typical (squared) bias, variance, training error, test error, and Bayes (or irreducible) error curves, on a single plot, as we go from less flexible statistical learning methods
+towards more flexible approaches. The x-axis should represent
+the amount of flexibility in the method, and the y-axis should
+represent the values for each curve. There should be five curves.
+Make sure to label each one.
+(b) Explain why each of the five curves has the shape displayed in
+part (a).
+
+
+**Solution to 2.4.3**
+```{r, eval = F}
+# (a) Plot the curves
+## Bias-Variance Decomposition Curves (Conceptual Sketch)
+## 5 curves: squared bias, variance, training error, test error, Bayes error
+
+# 1) x-axis: flexibility grid
+flex <- seq(0, 1, length.out = 300)
+
+# 2) Construct typical curve shapes (purely illustrative)
+bias2 <- (1 - flex)^2 + 0.02                  # decreasing
+var   <- 0.02 + 0.9 * flex^2                  # increasing
+bayes <- rep(0.15, length(flex))              # flat (irreducible error)
+
+train_err <- 0.85 * exp(-4.5 * flex) + 0.05   # decreasing, can approach ~0
+
+# test error roughly = bias^2 + variance + irreducible error (plus a tiny wiggle)
+test_err <- bias2 + var + bayes
+
+# 3) Plot everything on one figure
+ylim_max <- max(bias2, var, train_err, test_err, bayes) * 1.05
+
+plot(
+  flex, bias2, type = "l", lwd = 3,
+  xlab = "Flexibility (low  \u2192  high)",
+  ylab = "Error / Quantity",
+  ylim = c(0, ylim_max),
+  main = "Bias-Variance Decomposition: Typical Curves"
+)
+
+lines(flex, var,       lwd = 3, lty = 2)
+lines(flex, train_err, lwd = 3, lty = 3)
+lines(flex, test_err,  lwd = 3, lty = 1)
+lines(flex, bayes,     lwd = 3, lty = 4)
+
+legend(
+  "topright", bty = "n", lwd = 3,
+  legend = c("Squared Bias", "Variance", "Training Error", "Test Error", "Bayes (Irreducible) Error"),
+  lty = c(1, 2, 3, 1, 4)
+)
+
+# 4) Optional: mark the minimum of test error
+min_idx <- which.min(test_err)
+points(flex[min_idx], test_err[min_idx], pch = 19)
+text(flex[min_idx], test_err[min_idx],
+     labels = "Min test error", pos = 4, cex = 0.9)
+
+```
+
+
+
 
 ```{r, eval = F}
 library(tidyverse)
