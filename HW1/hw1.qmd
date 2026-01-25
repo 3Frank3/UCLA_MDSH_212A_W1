@@ -60,7 +60,7 @@ should be five curves. Make sure to label each one.
 
 **Solution to 2.4.3(a)**
 
-```{r, eval = F}
+```{r, eval = T}
 # (a) Plot the curves
 ## Bias-Variance Decomposition Curves (Conceptual Sketch)
 ## 5 curves: squared bias, variance, training error, test error, Bayes error
@@ -108,37 +108,75 @@ text(flex[min_idx], test_err[min_idx],
 
 ```
 
-**Solution to 2.4.3(b)** 
-```{r, eval = F}
-cat("
-### (b) Explanation of the Five Curves
+**Solution to 2.4.3(b)** *(b) Explain why each curve has the shape in
+(a)*
 
-**Squared Bias**  
-Squared bias decreases as model flexibility increases because more flexible models
-can better approximate the true underlying function. Simple models impose strong
-structural assumptions, leading to systematic underfitting and high bias.
+#### Squared bias (decreases with flexibility)
 
-**Variance**  
-Variance increases with flexibility because flexible models are more sensitive to
-random fluctuations in the training data. Small changes in the sample can lead to
-large changes in the fitted model.
+Bias measures **systematic error** from using an overly restrictive
+model class.\
+When flexibility is **low**, the model cannot represent the true signal
+(f(X)) well (underfitting), so the bias is **large**.\
+As flexibility increases, the model class can approximate (f(X)) more
+accurately, so **squared bias decreases**.
 
-**Training Error**  
-Training error decreases monotonically as flexibility increases because more
-flexible models can fit the training data more closely, including noise in the data.
+#### Variance (increases with flexibility)
 
-**Test Error**  
-Test error is U-shaped as a function of flexibility. Initially, increasing
-flexibility reduces bias faster than it increases variance, leading to lower test
-error. Beyond an optimal level, variance dominates and test error increases due to
-overfitting.
+Variance measures how much the fitted function would change if we
+trained the model on a different sample from the same population.
 
-**Bayes (Irreducible) Error**  
-The Bayes error remains constant across all levels of flexibility because it
-represents variability in the response that cannot be explained by any model,
-regardless of complexity.
-")
-```
+When model flexibility is **low**, the fitted model is highly
+constrained and tends to be stable across different training samples,
+resulting in **low variance**.
+
+As model flexibility increases, the method becomes more sensitive to the
+particular training data, including random noise. Consequently,
+predictions can vary substantially across different samples, leading to
+**higher variance**.
+
+#### Training error (monotonically decreases)
+
+Training error is computed on the **same data used to fit the model**.\
+More flexibility gives the method more freedom to fit the training
+points, so training error **cannot increase** as flexibility increases
+and typically **decreases**, often approaching (0) for very flexible
+methods.
+
+#### Test error (U-shaped)
+
+Test error measures how well the model generalizes to new, unseen data.\
+It is governed by the bias–variance tradeoff:
+
+$$
+\mathbb{E}\left[ \{Y - \hat f(X)\}^2 \right]
+=
+\text{Bias}^2
++
+\text{Variance}
++
+\text{Irreducible Error}.
+$$
+
+When model flexibility is **low**, the model suffers from high bias due
+to underfitting, leading to a **large test error**.
+
+As flexibility increases, the reduction in bias dominates the increase
+in variance, causing the **test error to decrease**.
+
+When flexibility becomes **very high**, variance increases substantially
+due to overfitting the training data, resulting in an **increase in test
+error**.
+
+This produces the characteristic **U-shaped curve** for test error as a
+function of model flexibility.
+
+#### Bayes (irreducible) error (flat)
+
+The irreducible error is due to randomness in (Y\mid X) (noise,
+unmeasured factors, inherent variability).\
+No matter how flexible the method is, this component cannot be
+eliminated, so it is **constant** across flexibility and appears as a
+**horizontal line**.
 
 ```{r, eval = F}
 library(tidyverse)
