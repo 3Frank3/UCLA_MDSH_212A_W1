@@ -40,6 +40,69 @@ $$ minimizes the mean squared prediction error $$
 $$ where the expectations averages over variations in both $X$ and $Y$.
 (Hint: condition on $X$.)
 
+#### Proof
+
+Using the law of total expectation,
+
+$$
+\mathbb{E}\{[Y - f(X)]^2\}
+= \mathbb{E}\bigl[ \mathbb{E}\{[Y - f(X)]^2 \mid X\} \bigr].
+$$
+
+For a fixed value of $X$,
+
+$$
+\mathbb{E}\{[Y - f(X)]^2 \mid X\}
+= \mathbb{E}\{[Y - \mathbb{E}(Y\mid X) + \mathbb{E}(Y\mid X) - f(X)]^2 \mid X\}.
+$$
+
+Expanding the square,
+
+$$
+\begin{aligned}
+= {} & \mathbb{E}\{[Y - \mathbb{E}(Y\mid X)]^2 \mid X\} \\
+& + [\mathbb{E}(Y\mid X) - f(X)]^2 \\
+& + 2\,\mathbb{E}\{[Y - \mathbb{E}(Y\mid X)] \mid X\}[\mathbb{E}(Y\mid X) - f(X)].
+\end{aligned}
+$$
+
+The cross term is zero because
+
+$$
+\mathbb{E}\{Y - \mathbb{E}(Y\mid X)\mid X\} = 0.
+$$
+
+Therefore,
+
+$$
+\mathbb{E}\{[Y - f(X)]^2 \mid X\}
+= \operatorname{Var}(Y\mid X)
++ [\mathbb{E}(Y\mid X) - f(X)]^2.
+$$
+
+Taking expectation over $X$,
+
+$$
+\mathbb{E}\{[Y - f(X)]^2\}
+= \mathbb{E}[\operatorname{Var}(Y\mid X)]
++ \mathbb{E}\{[\mathbb{E}(Y\mid X) - f(X)]^2\}.
+$$
+
+The first term does not depend on $f$, so the expression is minimized
+when
+
+$$
+f(X) = \mathbb{E}(Y\mid X).
+$$
+
+Hence,
+
+$$
+f_{\text{opt}}(X) = \mathbb{E}(Y\mid X)
+$$
+
+minimizes the mean squared prediction error.
+
 ### Bias-variance trade-off
 
 Given an estimate $\hat f$ of $f$, show that the test error at a $x_0$
@@ -48,34 +111,72 @@ can be decomposed as $$
 $$ where the expectation averages over the variability in $y_0$ and
 $\hat f$.
 
+#### Proof
+
+Start from
+
+$$
+y_0 - \hat f(x_0)
+= f(x_0) - \hat f(x_0) + \varepsilon.
+$$
+
+Squaring and taking expectation,
+
+$$
+\begin{aligned}
+\mathbb{E}\{[y_0 - \hat f(x_0)]^2\}
+= {} & \mathbb{E}\{[f(x_0) - \hat f(x_0)]^2\} \\
+& + \mathbb{E}(\varepsilon^2)
++ 2\,\mathbb{E}\{[f(x_0) - \hat f(x_0)]\varepsilon\}.
+\end{aligned}
+$$
+
+Since $\varepsilon$ has mean zero and is independent of $\hat f$,
+
+$$
+\mathbb{E}\{[f(x_0) - \hat f(x_0)]\varepsilon\} = 0.
+$$
+
+Thus,
+
+$$
+\mathbb{E}\{[y_0 - \hat f(x_0)]^2\}
+= \mathbb{E}\{[f(x_0) - \hat f(x_0)]^2\}
++ \operatorname{Var}(\varepsilon).
+$$
+
+Now decompose the first term:
+
+$$
+\mathbb{E}\{[f(x_0) - \hat f(x_0)]^2\}
+= \operatorname{Var}(\hat f(x_0))
++ [\mathbb{E}(\hat f(x_0)) - f(x_0)]^2.
+$$
+
+Therefore,
+
+$$
+\mathbb{E}\{[y_0 - \hat f(x_0)]^2\}
+= \operatorname{Var}(\hat f(x_0))
++ [\operatorname{Bias}(\hat f(x_0))]^2
++ \operatorname{Var}(\varepsilon).
+$$
+
 ## ISL Exercise 2.4.3 (10% pts)
 
-*2.4.3. We now revisit the bias-variance decomposition.* (a) Provide a
-sketch of typical (squared) bias, variance, training error, test error,
-and Bayes (or irreducible) error curves, on a single plot, as we go from
-less flexible statistical learning methods towards more flexible
-approaches. The x-axis should represent the amount of flexibility in the
-method, and the y-axis should represent the values for each curve. There
-should be five curves. Make sure to label each one.
-
-**Solution to 2.4.3(a)**
+### Solution to 2.4.3(a)
 
 ```{r, eval = T}
-# (a) Plot the curves
-## Bias-Variance Decomposition Curves (Conceptual Sketch)
-## 5 curves: squared bias, variance, training error, test error, Bayes error
 
 # 1) x-axis: flexibility grid
 flex <- seq(0, 1, length.out = 300)
 
-# 2) Construct typical curve shapes (purely illustrative)
+# 2) Construct typical curve shapes 
 bias2 <- (1 - flex)^2 + 0.02                  # decreasing
 var   <- 0.02 + 0.9 * flex^2                  # increasing
 bayes <- rep(0.15, length(flex))              # flat (irreducible error)
 
 train_err <- 0.85 * exp(-4.5 * flex) + 0.05   # decreasing, can approach ~0
-
-# test error roughly = bias^2 + variance + irreducible error (plus a tiny wiggle)
 test_err <- bias2 + var + bayes
 
 # 3) Plot everything on one figure
@@ -100,16 +201,9 @@ legend(
   lty = c(1, 2, 3, 1, 4)
 )
 
-# 4) Optional: mark the minimum of test error
-min_idx <- which.min(test_err)
-points(flex[min_idx], test_err[min_idx], pch = 19)
-text(flex[min_idx], test_err[min_idx],
-     labels = "Min test error", pos = 4, cex = 0.9)
-
 ```
 
-**Solution to 2.4.3(b)** *(b) Explain why each curve has the shape in
-(a)*
+### Solution to 2.4.3(b)
 
 #### Squared bias (decreases with flexibility)
 
@@ -178,12 +272,101 @@ No matter how flexible the method is, this component cannot be
 eliminated, so it is **constant** across flexibility and appears as a
 **horizontal line**.
 
-```{r, eval = F}
-library(tidyverse)
-fit <- lm(sales ~ TV, data = )
-```
-
 ## ISL Exercise 2.4.4 (10% pts)
+
+### (a) Classification problems
+
+#### Application 1: Email spam detection
+
+-   **Response:** Whether an email is spam or not (spam / not spam).
+-   **Predictors:** Frequency of certain keywords, presence of links or
+    attachments, sender information, email length.
+-   **Goal:** Prediction.
+
+The primary goal is to accurately classify new incoming emails as spam
+or not spam. Interpretation of individual predictors is less important
+than overall classification accuracy.
+
+#### Application 2: Medical diagnosis
+
+-   **Response:** Disease status (e.g., cancer / no cancer).
+-   **Predictors:** Patient age, lab test results, imaging measurements,
+    genetic markers, medical history.
+-   **Goal:** Inference and prediction.
+
+Prediction is important for identifying high-risk patients, while
+inference is also valuable to understand which clinical factors are most
+strongly associated with the disease.
+
+#### Application 3: Credit card fraud detection
+
+-   **Response:** Whether a transaction is fraudulent (yes / no).
+-   **Predictors:** Transaction amount, location, time of purchase,
+    merchant type, user spending patterns.
+-   **Goal:** Prediction.
+
+The objective is to detect fraudulent transactions in real time.
+Understanding individual predictors is secondary to minimizing false
+negatives and false positives.
+
+------------------------------------------------------------------------
+
+### (b) Regression problems
+
+#### Application 1: House price prediction
+
+-   **Response:** Sale price of a house.
+-   **Predictors:** Square footage, number of bedrooms, neighborhood,
+    age of the house, proximity to schools.
+-   **Goal:** Prediction.
+
+The goal is to accurately predict housing prices for new properties
+based on their characteristics.
+
+#### Application 2: Estimating the effect of advertising spending
+
+-   **Response:** Product sales revenue.
+-   **Predictors:** Advertising expenditures across different media (TV,
+    online, print), pricing, seasonality.
+-   **Goal:** Inference.
+
+Here, the main interest is understanding how changes in advertising
+spending affect sales, rather than predicting sales as accurately as
+possible.
+
+#### Application 3: Predicting patient hospital stay length
+
+-   **Response:** Length of hospital stay (in days).
+-   **Predictors:** Patient age, diagnosis, severity score, treatment
+    type, comorbidities.
+-   **Goal:** Prediction.
+
+Accurate prediction helps hospitals allocate resources and plan staffing
+efficiently.
+
+------------------------------------------------------------------------
+
+### (c) Cluster analysis problems
+
+#### Application 1: Customer segmentation
+
+Customers can be grouped based on purchasing behavior, demographics, and
+browsing history.\
+This helps businesses tailor marketing strategies to different customer
+segments without predefined labels.
+
+#### Application 2: Gene expression analysis
+
+Genes can be clustered based on similar expression patterns across
+samples.\
+This can reveal groups of genes involved in similar biological processes
+or pathways.
+
+#### Application 3: Social network analysis
+
+Individuals can be clustered based on interaction patterns, shared
+interests, or communication frequency.\
+This helps identify communities or subgroups within large networks.
 
 ## ISL Exercise 2.4.10 (30% pts)
 
@@ -199,9 +382,343 @@ Boston <- read_csv("https://raw.githubusercontent.com/ucla-biostat-212a/2026wint
   print(width = Inf)
 ```
 
+### (a) How many rows? How many columns? What do rows/columns represent?
+
+```{r, evalue = F}
+dim(Boston)
+```
+
+-   The Boston data set contains 506 rows and 14 columns.
+
+-   Each row represents a census tract in the Boston metropolitan area.
+
+-   Each column represents a variable describing characteristics of that
+    census tract, such as crime rate, tax rate, pupil–teacher ratio, and
+    median home value.
+
+### (b) Pairwise scatterplots of the predictors. Describe findings.
+
+```{r, evalue = F}
+pairs(Boston, pch = 19, cex = 0.35)
+```
+
+-   Several predictors show clear non-random patterns (association), not
+    just clouds.
+
+-   nox tends to increase with indus and with older housing (age),
+    suggesting more industrial/older areas have higher pollution.
+
+-   rm (rooms) is positively related to medv (home value).
+
+-   lstat (lower status) is strongly negatively related to medv.
+
+-   Some predictors are highly skewed (notably crim, zn), and some
+    relationships look non-linear.
+
+### (c) Are any predictors associated with per-capita crime rate (crim)? Explain.
+
+```{r, evalue = F}
+crim_cor <- sort(cor(Boston)[, "crim"], decreasing = TRUE)
+head(crim_cor, 6)
+tail(crim_cor, 6)
+par(mfrow = c(2,2))
+plot(Boston$tax, Boston$crim, pch=19, cex=.5, xlab="tax", ylab="crim")
+plot(Boston$ptratio, Boston$crim, pch=19, cex=.5, xlab="ptratio", ylab="crim")
+plot(Boston$medv, Boston$crim, pch=19, cex=.5, xlab="medv", ylab="crim")
+plot(Boston$lstat, Boston$crim, pch=19, cex=.5, xlab="lstat", ylab="crim")
+par(mfrow = c(1,1))
+```
+
+-   crim tends to be higher when tax and ptratio are higher
+    (worse-funded/strained areas).
+
+-   crim tends to be lower when medv is higher (wealthier areas).
+
+-   crim is also higher when lstat is higher (more disadvantage).
+
+### (d) Any tracts with particularly high crim, tax, ptratio? Comment on ranges.
+
+```{r, evalue = F}
+rng <- sapply(Boston[, c("crim","tax","ptratio")], range)
+rng
+top_crim <- order(Boston$crim, decreasing = TRUE)[1:5]
+top_tax  <- order(Boston$tax,  decreasing = TRUE)[1:5]
+top_ptr  <- order(Boston$ptratio, decreasing = TRUE)[1:5]
+
+Boston[top_crim, c("crim","tax","ptratio","medv","rm","lstat")]
+Boston[top_tax,  c("crim","tax","ptratio","medv","rm","lstat")]
+Boston[top_ptr,  c("crim","tax","ptratio","medv","rm","lstat")]
+```
+
+Yes—there are clearly a few census tracts with extremely high crime
+rates (strong right-skew). Tax rates and pupil–teacher ratios also have
+tracts near the upper end, but crim shows the most extreme spread.
+
+### (e) How many census tracts bound the Charles River?
+
+```{r, evalue = F}
+sum(Boston$chas == 1)
+
+```
+
+### (f) What is the median pupil–teacher ratio?
+
+```{r, evalue = F}
+median(Boston$ptratio)
+```
+
+### (g) Which tract has the lowest medv? Compare its predictors to overall ranges.
+
+```{r, evalue = F}
+idx_min_medv <- which.min(Boston$medv)
+idx_min_medv
+Boston[idx_min_medv, ]
+
+vars <- names(Boston)
+comp <- data.frame(
+  variable = vars,
+  tract_value = as.numeric(Boston[idx_min_medv, vars]),
+  overall_min = sapply(Boston[, vars], min),
+  overall_max = sapply(Boston[, vars], max)
+)
+comp
+```
+
+This tract’s crim is near the top end of its range, lstat is relatively
+high, and medv is the minimum possible in this data. Overall it looks
+like a tract with multiple disadvantage indicators consistent with very
+low home values.
+
+### (h) How many tracts have rm \> 7? rm \> 8? Comment on rm \> 8.
+
+```{r, evalue = F}
+n_gt7 <- sum(Boston$rm > 7)
+n_gt8 <- sum(Boston$rm > 8)
+n_gt7; n_gt8
+
+Boston[Boston$rm > 8, c("rm","medv","crim","tax","ptratio","lstat","nox")]
+summary(Boston[Boston$rm > 8, c("rm","medv","crim","tax","ptratio","lstat","nox")])
+```
+
+Tracts with rm \> 8 generally have high medv, low lstat, and often low
+crim, consistent with wealthier neighborhoods. They represent an extreme
+“large houses / high value” subset of the data.
+
 ## ISL Exercise 3.7.3 (20% pts)
 
+### (a) Which answer is correct, and why?
+
+```{r, eval = F}
+GPA <- seq(0, 5, by = 0.1)
+diff_salary <- 35 - 10 * GPA
+GPA[which.min(abs(diff_salary))]
+```
+
+-   If GPA \< 3.5, then college graduates earn more on average.
+-   If GPA \> 3.5, then high school graduates earn more on average.
+-   If GPA = 3.5, both earn the same on average.
+
+Therefore, the correct answer is **(iii)**:
+
+### (b) Predict the salary of a college graduate with IQ = 110 and GPA = 4.0
+
+```{r, eval = F}
+GPA <- 4.0
+IQ <- 110
+Level <- 1
+
+salary_hat <- 50 +
+  20 * GPA +
+  0.07 * IQ +
+  35 * Level +
+  0.01 * GPA * IQ -
+  10 * GPA * Level
+
+salary_hat
+
+```
+
+The predicted salary is \$137,300.
+
+### (c) True or False: Since the coefficient for the GPA/IQ interaction term is very small, there is very little evidence of an interaction effect.
+
+False.
+
+Although the coefficient for the GPA/IQ interaction term is numerically
+small (0.01), the interaction term multiplies GPA and IQ, which can be
+large in practice. Therefore, the interaction effect can still have a
+meaningful impact on the predicted salary, especially for higher values
+of GPA and IQ.
+
 ## ISL Exercise 3.7.15 (20% pts)
+
+```{r}
+library(ISLR2)
+data(Boston)
+y <- "crim"
+predictors <- setdiff(names(Boston), y)
+predictors
+```
+
+### (a) Simple linear regression for each predictor
+
+```{r}
+uni_models <- lapply(predictors, function(v) {
+  lm(as.formula(paste(y, "~", v)), data = Boston)
+})
+names(uni_models) <- predictors
+
+uni_summary <- do.call(rbind, lapply(predictors, function(v) {
+  sm <- summary(uni_models[[v]])
+  data.frame(
+    Predictor = v,
+    Slope = sm$coefficients[2, 1],
+    P_value = sm$coefficients[2, 4],
+    R2 = sm$r.squared,
+    row.names = NULL
+  )
+}))
+
+uni_summary <- uni_summary[order(uni_summary$P_value), ]
+uni_summary
+uni_sig <- subset(uni_summary, P_value < 0.05)
+uni_sig
+```
+
+results\[order(results\$P_value), \]
+
+-   Most predictors show a statistically significant association with
+    per capita crime rate at the 5% significance level.
+
+-   Predictors such as nox, rad, tax, lstat, ptratio, and indus have
+    extremely small p-values, indicating strong evidence of association.
+
+-   A few predictors (for example chas) show weaker or no statistically
+    significant association with crime rate.
+
+```{r, eval = F}
+top_vars <- head(uni_summary$Predictor, 4)
+
+par(mfrow = c(2,2))
+for (v in top_vars) {
+  plot(Boston[[v]], Boston$crim,
+       xlab = v, ylab = "crim",
+       pch = 19, cex = 0.6)
+  abline(uni_models[[v]], lwd = 2)
+  title(main = paste("crim ~", v))
+}
+par(mfrow = c(1,1))
+```
+
+### (b) Multiple linear regression using all predictors
+
+```{r}
+multi_model <- lm(crim ~ ., data = Boston)
+summary(multi_model)
+
+multi_coef <- summary(multi_model)$coefficients
+
+multi_summary <- data.frame(
+  Predictor = rownames(multi_coef),
+  Estimate = multi_coef[, 1],
+  P_value = multi_coef[, 4],
+  row.names = NULL
+)
+
+multi_summary_no_intercept <- subset(multi_summary, Predictor != "(Intercept)")
+multi_summary_no_intercept[order(multi_summary_no_intercept$P_value), ]
+
+multi_sig <- subset(multi_summary_no_intercept, P_value < 0.05)
+multi_sig
+```
+
+At the 5% significance level, we can reject the null hypothesis H0: βj =
+0 for predictors with p-values less than 0.05.
+
+### (c) Comparison between simple and multiple regression results
+
+```{r, eval = F}
+uni_slopes <- setNames(uni_summary$Slope, uni_summary$Predictor)
+
+multi_betas <- coef(multi_model)[-1]
+
+common <- intersect(names(uni_slopes), names(multi_betas))
+
+coef_compare <- data.frame(
+  Predictor = common,
+  Univariate = uni_slopes[common],
+  Multiple = multi_betas[common],
+  row.names = NULL
+)
+
+coef_compare
+
+plot(coef_compare$Univariate, coef_compare$Multiple,
+     xlab = "Univariate coefficient (crim ~ X)",
+     ylab = "Multiple regression coefficient (crim ~ all X)",
+     pch = 19)
+
+abline(0, 1, lty = 2)  # reference line y = x
+
+text(coef_compare$Univariate, coef_compare$Multiple,
+     labels = coef_compare$Predictor,
+     pos = 4, cex = 0.7)
+
+```
+
+-   Points lying close to the diagonal line indicate predictors whose
+    estimated effects are similar in both models.
+
+-   Large deviations from the diagonal suggest that the marginal
+    association observed in simple regression is explained by other
+    predictors in the multiple regression model.
+
+-   Some predictors change sign or shrink substantially in magnitude,
+    highlighting the impact of correlations among predictors.
+
+### (d) Evidence of non-linear association (cubic models)
+
+```{r, eval = F}
+predictors <- setdiff(names(Boston), "crim")
+
+cubic_models <- lapply(predictors, function(v) {
+  lm(as.formula(paste0("crim ~ poly(", v, ", 3, raw = TRUE)")), data = Boston)
+})
+names(cubic_models) <- predictors
+
+cubic_summary <- do.call(rbind, lapply(predictors, function(v) {
+  sm <- summary(cubic_models[[v]])
+  coefs <- sm$coefficients
+  
+  rn <- rownames(coefs)
+  
+  x2_name <- paste0("poly(", v, ", 3, raw = TRUE)2")
+  x3_name <- paste0("poly(", v, ", 3, raw = TRUE)3")
+  
+  p_x2 <- if (x2_name %in% rn) coefs[x2_name, 4] else NA_real_
+  p_x3 <- if (x3_name %in% rn) coefs[x3_name, 4] else NA_real_
+  
+  data.frame(
+    Predictor = v,
+    P_X2 = p_x2,
+    P_X3 = p_x3,
+    Nonlinear_0.05 = (is.finite(p_x2) && p_x2 < 0.05) || (is.finite(p_x3) && p_x3 < 0.05),
+    row.names = NULL
+  )
+}))
+
+cubic_summary <- cubic_summary[order(!cubic_summary$Nonlinear_0.05, cubic_summary$P_X2, cubic_summary$P_X3), ]
+cubic_summary
+
+
+
+```
+
+Several predictors show evidence of non-linear association with per
+capita crime rate, as indicated by significant higher-order polynomial
+terms. This suggests that linear models may not fully capture the
+relationship between crime rate and certain predictors, and more
+flexible modeling approaches could be appropriate for these variables.
 
 ## Bonus question (Extra credits)
 
@@ -210,4 +727,63 @@ correlation between the response vector
 $\mathbf{y} = (y_1, \ldots, y_n)^T$ and the fitted values
 $\hat{\mathbf{y}} = (\hat y_1, \ldots, \hat y_n)^T$. That is $$
 R^2 = 1 - \frac{\text{RSS}}{\text{TSS}} = [\operatorname{Cor}(\mathbf{y}, \hat{\mathbf{y}})]^2.
+$$
+
+#### Proof
+
+In multiple linear regression with an intercept,
+
+$$
+R^2 = 1 - \frac{\mathrm{RSS}}{\mathrm{TSS}}.
+$$
+
+By least squares orthogonality,
+
+$$
+\mathrm{TSS} = \mathrm{ESS} + \mathrm{RSS},
+$$
+
+where
+
+$$
+\mathrm{ESS} = \sum_{i=1}^n (\hat y_i - \bar y)^2.
+$$
+
+Hence,
+
+$$
+R^2 = \frac{\mathrm{ESS}}{\mathrm{TSS}}.
+$$
+
+The sample correlation between $\mathbf y$ and $\hat{\mathbf y}$ is
+
+$$
+\mathrm{Cor}(\mathbf y, \hat{\mathbf y})
+=
+\frac{\sum_{i=1}^n (y_i-\bar y)(\hat y_i-\bar y)}
+{\sqrt{\mathrm{TSS}\,\mathrm{ESS}}}.
+$$
+
+Since the residuals are orthogonal to the fitted values,
+
+$$
+\sum_{i=1}^n (y_i-\bar y)(\hat y_i-\bar y)
+=
+\sum_{i=1}^n (\hat y_i-\bar y)^2
+=
+\mathrm{ESS}.
+$$
+
+Therefore,
+
+$$
+\mathrm{Cor}(\mathbf y, \hat{\mathbf y})
+=
+\sqrt{\frac{\mathrm{ESS}}{\mathrm{TSS}}},
+$$
+
+and squaring both sides yields
+
+$$
+R^2 = [\mathrm{Cor}(\mathbf y, \hat{\mathbf y})]^2.
 $$
