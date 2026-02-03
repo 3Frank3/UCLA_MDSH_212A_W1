@@ -24,12 +24,143 @@ knitr:
 
 ## ISL Exercise 4.8.1 (10pts)
 
+Logistic regression model(4.2) $$
+p(X) = \frac{e^{\beta_0 + \beta_1 X}}{1 + e^{\beta_0 + \beta_1 X}}
+$$ Define the linear predictor: $$
+\eta = \beta_0 + \beta_1 X
+$$ So the model can also be written as: $$
+p(X) = \frac{e^{\eta}}{1 + e^{\eta}}
+$$ Compute 1−P(X): $$
+1 - p(X) = \frac{1}{1 + e^{\eta}}
+$$ Now take the ratio: $$
+\frac{p(X)}{1 - p(X)} = e^{\eta}
+$$ Substituting back for η gives: $$
+\frac{p(X)}{1 - p(X)} = e^{\beta_0 + \beta_1 X}
+$$ Which is exactly (4.3)
+
+---
+
 ## ISL Exercise 4.8.6 (10pts)
+### (a) Estimate the Probability
+The logistic function: 
+$$P(Y=1) =\frac{e^{\beta_0 + \beta_1X_1 + \beta_2X_2}}{1 + e^{\beta_0 + \beta_1X_1 + \beta_2X_2}}$$ 
+1. **Calculate the linear predictor (**$z$): 
+$$z = -6 + 0.05(40) + 1(3.5)$$ 
+$$z = -6 + 2 + 3.5 = -0.5$$
+2. **Calculate the probability:**
+   $$P(Y=1) = \frac{e^{-0.5}}{1 + e^{-0.5}} \approx \frac{0.6065}{1.6065} \approx 0.3775$$
+The estimated probability is **37.75%.**
+
+### (b) Required Study Hours
+For a probability of 50% ($P=0.5$), the log-odds must equal 0. Therefore, we set the linear equation to zero:
+$$0 = \hat\beta_0 + \hat\beta_1X_1 + \hat\beta_2X_2$$
+1. **Plug in known values:**
+   $$0 = -6 + 0.05(X_1) + 1(3.5)$$
+   $$0 = -2.5 + 0.05(X_1)$$
+
+2. **Solve for $X_1$:**
+   $$2.5 = 0.05(X_1)$$
+   $$X_1 = \frac{2.5}{0.05} = 50$$
+The student would need to study for **50 hours**.
+
+---
 
 ## ISL Exercise 4.8.9 (10pts)
+### (a)
+The relationship between probability ($p$) and odds ($O$) is defined by the formula:
+$$p = \frac{O}{1 + O}$$
+
+1. **Plug in the given odds:**
+   $$p = \frac{0.37}{1 + 0.37}$$
+
+2. **Calculate the result:**
+   $$p = \frac{0.37}{1.37} \approx 0.2701$$
+Approximately **27.01%** of people will default.
+### (b)
+we use the formula:
+$$O = \frac{p}{1 - p}$$
+1. **Plug in the given probability ($p = 0.16$):**
+   $$O = \frac{0.16}{1 - 0.16}$$
+
+2. **Calculate the result:**
+   $$O = \frac{0.16}{0.84} \approx 0.1905$$
+The odds of defaulting are approximately **0.1905**.
+
+---
 
 ## ISL Exercise 4.8.13 (a)-(i) (50pts)
 
+```{r}
+library(ISLR2)
+library(dplyr)
+library(ggplot2)
+```
+###(a)
+```{r,eval=True}
+glimpse(Weekly)
+summary(Weekly)
+```
+```{r,eval=True}
+#| label: fig-weekly-volume
+#| fig-cap: "Trading Volume over time (1990-2010)"
+plot(Weekly$Volume, 
+     main="Weekly Trading Volume", 
+     xlab="Weeks", 
+     ylab="Volume (in billions)")
+```
+```{r}
+#| layout-ncol: 4
+#| fig-cap: 
+#|   - "Lag 1 vs Lag 2"
+#|   - "Lag 2 vs Lag 3"
+#|   - "Lag 3 vs Lag 4"
+#|   - "Lag 4 vs Lag 5"
+
+# Correlations
+cor_12 <- cor(Weekly$Lag1, Weekly$Lag2)
+cor_23 <- cor(Weekly$Lag2, Weekly$Lag3)
+cor_34 <- cor(Weekly$Lag3, Weekly$Lag4)
+cor_45 <- cor(Weekly$Lag4, Weekly$Lag5)
+
+plot(Weekly$Lag1, Weekly$Lag2, main=paste("Corr:", round(cor_12, 4)))
+plot(Weekly$Lag2, Weekly$Lag3, main=paste("Corr:", round(cor_23, 4)))
+plot(Weekly$Lag3, Weekly$Lag4, main=paste("Corr:", round(cor_34, 4)))
+plot(Weekly$Lag4, Weekly$Lag5, main=paste("Corr:", round(cor_45, 4)))
+```
+```{r}
+# Create the average lag variable
+Weekly$Lag_Avg <- rowMeans(Weekly[, c("Lag1", "Lag2", "Lag3", "Lag4", "Lag5")])
+
+# Boxplot comparison
+boxplot(Lag_Avg ~ Direction, data = Weekly, 
+        col = c("firebrick", "forestgreen"),
+        main = "Average of Last 5 Weeks vs. Today's Direction",
+        ylab = "Average Return (Lags 1-5)")
+
+# Mean Comparison
+aggregate(Lag_Avg ~ Direction, data = Weekly, mean)
+```
+```{r}
+# Compare Volume by Year to see the explosion in trading activity
+library(ggplot2)
+ggplot(Weekly, aes(x = factor(Year), y = Volume)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(title = "Trading Volume Growth by Year", x = "Year")
+```
+###(b)
+```{r}
+# Fit the logistic regression model
+# Direction is the response, all others (except Today and Year) are predictors
+glm_fit <- glm(
+  Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, 
+  data = Weekly, 
+  family = binomial
+)
+
+# Print the summary of the model
+summary(glm_fit)
+```
 ## Bonus question: ISL Exercise 4.8.13 Part (j) (30pts)
 
 ## Bonus question: ISL Exercise 4.8.4 (30pts)
