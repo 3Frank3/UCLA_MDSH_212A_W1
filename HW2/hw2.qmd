@@ -38,69 +38,49 @@ $$ Substituting back for η gives: $$
 \frac{p(X)}{1 - p(X)} = e^{\beta_0 + \beta_1 X}
 $$ Which is exactly (4.3)
 
----
-
 ## ISL Exercise 4.8.6 (10pts)
+
 ### (a) Estimate the Probability
-The logistic function: 
-$$P(Y=1) =\frac{e^{\beta_0 + \beta_1X_1 + \beta_2X_2}}{1 + e^{\beta_0 + \beta_1X_1 + \beta_2X_2}}$$ 
-1. **Calculate the linear predictor (**$z$): 
-$$z = -6 + 0.05(40) + 1(3.5)$$ 
-$$z = -6 + 2 + 3.5 = -0.5$$
-2. **Calculate the probability:**
-   $$P(Y=1) = \frac{e^{-0.5}}{1 + e^{-0.5}} \approx \frac{0.6065}{1.6065} \approx 0.3775$$
-The estimated probability is **37.75%.**
+
+The logistic function: $$P(Y=1) =\frac{e^{\beta_0 + \beta_1X_1 + \beta_2X_2}}{1 + e^{\beta_0 + \beta_1X_1 + \beta_2X_2}}$$ 1. **Calculate the linear predictor (**$z$): $$z = -6 + 0.05(40) + 1(3.5)$$ $$z = -6 + 2 + 3.5 = -0.5$$ 2. **Calculate the probability:** $$P(Y=1) = \frac{e^{-0.5}}{1 + e^{-0.5}} \approx \frac{0.6065}{1.6065} \approx 0.3775$$ The estimated probability is **37.75%.**
 
 ### (b) Required Study Hours
-For a probability of 50% ($P=0.5$), the log-odds must equal 0. Therefore, we set the linear equation to zero:
-$$0 = \hat\beta_0 + \hat\beta_1X_1 + \hat\beta_2X_2$$
-1. **Plug in known values:**
-   $$0 = -6 + 0.05(X_1) + 1(3.5)$$
-   $$0 = -2.5 + 0.05(X_1)$$
 
-2. **Solve for $X_1$:**
-   $$2.5 = 0.05(X_1)$$
-   $$X_1 = \frac{2.5}{0.05} = 50$$
-The student would need to study for **50 hours**.
+For a probability of 50% ($P=0.5$), the log-odds must equal 0. Therefore, we set the linear equation to zero: $$0 = \hat\beta_0 + \hat\beta_1X_1 + \hat\beta_2X_2$$ 
 
----
+1. **Plug in known values:** $$0 = -6 + 0.05(X_1) + 1(3.5)$$ $$0 = -2.5 + 0.05(X_1)$$
+
+2. **Solve for** $X_1$: $$2.5 = 0.05(X_1)$$ $$X_1 = \frac{2.5}{0.05} = 50$$ The student would need to study for **50 hours**.
 
 ## ISL Exercise 4.8.9 (10pts)
+
 ### (a)
-The relationship between probability ($p$) and odds ($O$) is defined by the formula:
-$$p = \frac{O}{1 + O}$$
 
-1. **Plug in the given odds:**
-   $$p = \frac{0.37}{1 + 0.37}$$
+The relationship between probability ($p$) and odds ($O$) is defined by the formula: $$p = \frac{O}{1 + O}$$
 
-2. **Calculate the result:**
-   $$p = \frac{0.37}{1.37} \approx 0.2701$$
-Approximately **27.01%** of people will default.
-### (b)
-we use the formula:
-$$O = \frac{p}{1 - p}$$
-1. **Plug in the given probability ($p = 0.16$):**
-   $$O = \frac{0.16}{1 - 0.16}$$
+1.  **Plug in the given odds:** $$p = \frac{0.37}{1 + 0.37}$$
 
-2. **Calculate the result:**
-   $$O = \frac{0.16}{0.84} \approx 0.1905$$
-The odds of defaulting are approximately **0.1905**.
+2.  **Calculate the result:** $$p = \frac{0.37}{1.37} \approx 0.2701$$ Approximately **27.01%** of people will default.
 
----
+### (b) we use the formula: $$O = \frac{p}{1 - p}$$
+
+3.  **Plug in the given probability (**$p = 0.16$): $$O = \frac{0.16}{1 - 0.16}$$
+
+4.  **Calculate the result:** $$O = \frac{0.16}{0.84} \approx 0.1905$$ The odds of defaulting are approximately **0.1905**.
 
 ## ISL Exercise 4.8.13 (a)-(i) (50pts)
-
 ```{r}
 library(ISLR2)
 library(dplyr)
 library(ggplot2)
 ```
-###(a)
-```{r,eval=True}
+### (a)
+```{r,eval=TRUE}
 glimpse(Weekly)
 summary(Weekly)
 ```
-```{r,eval=True}
+
+```{r,eval=TRUE}
 #| label: fig-weekly-volume
 #| fig-cap: "Trading Volume over time (1990-2010)"
 plot(Weekly$Volume, 
@@ -108,6 +88,7 @@ plot(Weekly$Volume,
      xlab="Weeks", 
      ylab="Volume (in billions)")
 ```
+
 ```{r}
 #| layout-ncol: 4
 #| fig-cap: 
@@ -127,6 +108,7 @@ plot(Weekly$Lag2, Weekly$Lag3, main=paste("Corr:", round(cor_23, 4)))
 plot(Weekly$Lag3, Weekly$Lag4, main=paste("Corr:", round(cor_34, 4)))
 plot(Weekly$Lag4, Weekly$Lag5, main=paste("Corr:", round(cor_45, 4)))
 ```
+
 ```{r}
 # Create the average lag variable
 Weekly$Lag_Avg <- rowMeans(Weekly[, c("Lag1", "Lag2", "Lag3", "Lag4", "Lag5")])
@@ -140,6 +122,7 @@ boxplot(Lag_Avg ~ Direction, data = Weekly,
 # Mean Comparison
 aggregate(Lag_Avg ~ Direction, data = Weekly, mean)
 ```
+
 ```{r}
 # Compare Volume by Year to see the explosion in trading activity
 library(ggplot2)
@@ -148,19 +131,249 @@ ggplot(Weekly, aes(x = factor(Year), y = Volume)) +
   theme(axis.text.x = element_text(angle = 90)) +
   labs(title = "Trading Volume Growth by Year", x = "Year")
 ```
-###(b)
+
+### (b)
+
 ```{r}
-# Fit the logistic regression model
-# Direction is the response, all others (except Today and Year) are predictors
-glm_fit <- glm(
+library(gtsummary)
+logit_mod<- glm(
   Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, 
   data = Weekly, 
   family = binomial
 )
 
-# Print the summary of the model
-summary(glm_fit)
+summary(logit_mod)
 ```
+
+Based on the output, the only predictor that appears to be statistically significant is **`Lag2`**. Its p-value is approximately **0.0296**, which is below the 0.05 threshold.
+
+###(c)
+
+```{r}
+#  Get predicted probabilities
+logit_probs <- predict(logit_mod, type = "response")
+
+#  Create a vector of "Down" predictions
+logit_pred <- rep("Down", length(logit_probs))
+
+#  Change to "Up" where probability > 0.5
+logit_pred[logit_probs > 0.5] <- "Up"
+
+# Generate the confusion matrix
+table(Predicted = logit_pred, Actual = Weekly$Direction)
+
+# Calculate overall fraction of correct predictions (Accuracy)
+mean(logit_pred == Weekly$Direction)
+```
+
+**1. Overall Accuracy:** The model correctly predicts the market direction approximately **56.1%** of the time.
+
+**2. The Mistakes:** The confusion matrix reveals a significant bias in the model's performance:
+
+-   **True Positives (Up predicted as Up):** The model is very good at identifying "Up" weeks. It correctly predicted **557** "Up" weeks out of 605 actual "Up" weeks (a sensitivity of about $92\%$).
+-   **False Positives (Down predicted as Up):** This is the model's main weakness. It predicted "Up" for **430** weeks that actually went "Down".
+-   **True Negatives (Down predicted as Down):** The model only correctly identified **54** "Down" weeks out of 484 actual "Down" weeks (a specificity of only about $11\%$).
+
+**Conclusion:** The logistic regression model is **over-predicting the "Up" direction**. Because the market went "Up" more often than "Down" during this 21-year period ($605/1089 \approx 55.6\%$), a "naive" model that simply predicted "Up" every single week would have an accuracy of $55.6\%$. Our model's accuracy ($56.1\%$) is barely better than that naive baseline, suggesting it has very little actual predictive power.
+
+### (d)
+#### 1. Split the Data
+```{r}
+# Create training index
+train <- (Weekly$Year < 2009)
+
+# Create the test set
+Weekly.test <- Weekly[!train, ]
+Direction.test <- Weekly$Direction[!train]
+```
+#### 2. Fit the Model and Predict
+```{r}
+glm_fit_train <- glm(
+  Direction ~ Lag2, 
+  data = Weekly, 
+  family = binomial, 
+  subset = train
+)
+
+# Predict probabilities for the test data (2009-2010)
+glm_probs_test <- predict(glm_fit_train, Weekly.test, type = "response")
+
+# Convert probabilities to class labels ("Down" or "Up")
+glm_pred_test <- rep("Down", length(glm_probs_test))
+glm_pred_test[glm_probs_test > 0.5] <- "Up"
+```
+#### 3. Confusion Matrix and Accuracy
+```{r}
+table(Predicted = glm_pred_test, Actual = Direction.test)
+
+mean(glm_pred_test == Direction.test)
+```
+### (e)
+```{r}
+library(MASS)
+
+# Fit LDA model on the training data
+lda_mod <- lda(
+  Direction ~ Lag2, 
+  data = Weekly, 
+  subset = train)
+
+lda_mod
+```
+```{r}
+# Make predictions on the test set
+lda_pred <- predict(lda_mod, Weekly.test)
+
+# The predict() function for LDA returns a list; 
+# 'class' contains the Down/Up labels.
+lda_class <- lda_pred$class
+
+# Confusion Matrix
+table(Predicted = lda_class, Actual = Direction.test)
+
+# Overall Accuracy
+mean(lda_class == Direction.test)
+```
+### (f)
+```{r}
+# Fit QDA model on the training data
+qda_fit <- qda(Direction ~ Lag2, data = Weekly, subset = train)
+
+qda_fit
+```
+```{r}
+# Make predictions on the test set
+qda_pred <- predict(qda_fit, Weekly.test)
+qda_class <- qda_pred$class
+
+# Confusion Matrix
+table(Predicted = qda_class, Actual = Direction.test)
+
+# Overall Accuracy
+mean(qda_class == Direction.test)
+```
+### (g)
+```{r}
+library(class)
+
+train.X <- as.matrix(Weekly$Lag2[train])
+test.X <- as.matrix(Weekly$Lag2[!train])
+
+# Create the vector for training labels
+train.Direction <- Weekly$Direction[train]
+```
+```{r}
+set.seed(1)
+knn.pred <- knn(train.X, test.X, train.Direction, k = 1)
+
+# Confusion Matrix
+table(Predicted = knn.pred, Actual = Direction.test)
+
+# Overall Accuracy
+mean(knn.pred == Direction.test)
+```
+### (h)
+```{r}
+library(e1071)
+
+# Fit the Naive Bayes model
+nb_fit <- naiveBayes(Direction ~ Lag2, data = Weekly, subset = train)
+
+nb_fit
+```
+```{r}
+# Make predictions
+nb_class <- predict(nb_fit, Weekly.test)
+
+# Confusion Matrix
+table(Predicted = nb_class, Actual = Direction.test)
+
+# Overall Accuracy
+mean(nb_class == Direction.test)
+```
+### (i)
+Summary of Model Performance\
+Logistic Regression: 62.5%\
+LDA: 62.5%\
+Naive Bayes: 58.7%\
+KNN (K=1): 50.0%\
+Based on these results, **Logistic Regression** and **LDA** provided the best results for this data.
+
 ## Bonus question: ISL Exercise 4.8.13 Part (j) (30pts)
+
+### 1. The "Momentum" Logistic Model (Lag1 + Lag2)
+Sometimes the immediate past week (`Lag1`) and the significant week (`Lag2`) work together to show a trend.
+
+```{r}
+# Logistic Regression with Lag1 and Lag2
+glm_mom <- glm(Direction ~ Lag1 + Lag2, 
+               data = Weekly, family = binomial, subset = train)
+
+glm_probs_mom <- predict(glm_mom, Weekly.test, type = "response")
+glm_pred_mom <- rep("Down", length(glm_probs_mom))
+glm_pred_mom[glm_probs_mom > 0.5] <- "Up"
+
+mean(glm_pred_mom == Direction.test)
+```
+
+### 2. Logistic Regression with Interaction (Lag2 * Volume)
+We test if the effect of `Lag2` depends on the trading `Volume`.
+
+```{r}
+# Logistic Regression with Interaction
+glm_exp <- glm(Direction ~ Lag2:Volume + Lag2, 
+               data = Weekly, family = binomial, subset = train)
+
+glm_probs_exp <- predict(glm_exp, Weekly.test, type = "response")
+glm_pred_exp <- rep("Down", length(glm_probs_exp))
+glm_pred_exp[glm_probs_exp > 0.5] <- "Up"
+
+# Accuracy
+mean(glm_pred_exp == Direction.test)
+```
+
+### 3. The "Volatility" LDA Model (Interaction & Squares)
+We test if the interaction between Volume and price movement, or the squared return (volatility), helps.
+
+```{r}
+# LDA with Volume interaction and squared Lag2
+lda_vol <- lda(Direction ~ Lag2 * Volume + I(Lag2^2), 
+               data = Weekly, subset = train)
+
+lda_pred_vol <- predict(lda_vol, Weekly.test)$class
+table(Predicted = lda_pred_vol, Actual = Direction.test)
+mean(lda_pred_vol == Direction.test)
+```
+
+### 4. Optimized KNN (Multi-variable)
+We use all 5 Lags but increase $K$ significantly to act as a "smoother."
+
+```{r}
+# Use all Lags for KNN
+train.X_all <- as.matrix(Weekly[train, c("Lag1", "Lag2", "Lag3", "Lag4", "Lag5")])
+test.X_all <- as.matrix(Weekly[!train, c("Lag1", "Lag2", "Lag3", "Lag4", "Lag5")])
+
+set.seed(1)
+# Try K = 50 for a stable multi-variable boundary
+knn_all_pred <- knn(train.X_all, test.X_all, train.Direction, k = 50)
+mean(knn_all_pred == Direction.test)
+```
+
+### 5. KNN with Optimized K (K = 10 and K = 100)
+A larger $K$ provides a smoother decision boundary, which usually helps with noisy financial data.
+
+```{r}
+set.seed(1)
+# Testing K = 10
+knn_10_pred <- knn(train.X, test.X, train.Direction, k = 10)
+acc_10 <- mean(knn_10_pred == Direction.test)
+
+# Testing K = 100
+knn_100_pred <- knn(train.X, test.X, train.Direction, k = 100)
+acc_100 <- mean(knn_100_pred == Direction.test)
+
+cat("Accuracy K=10:", acc_10, "\nAccuracy K=100:", acc_100)
+```
+After I experimented with multiple predictors (Lag1–Lag5, Volume, interactions, and squared terms) across all methods, the simplest model (Logistic/LDA with only Lag2) remained the most robust.
 
 ## Bonus question: ISL Exercise 4.8.4 (30pts)
